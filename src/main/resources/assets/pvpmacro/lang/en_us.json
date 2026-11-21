@@ -1,0 +1,16 @@
+{
+  "key.category.pvpmacro.main": "PvP Macro",
+  "key.pvpmacro.stun_slam": "Stun Slam",
+  "key.pvpmacro.sword_swap": "Sword Swap",
+  "key.pvpmacro.breach_swap": "Breach Swap",
+  "key.pvpmacro.lunge_swap": "Lunge Swap",
+  "key.pvpmacro.elytra_mace": "Elytra Mace",
+  "key.pvpmacro.insta_cart": "Insta Cart",
+  "key.pvpmacro.expo": "Xbow",
+  "key.pvpmacro.pearl_catch": "Pearl Catch",
+  "key.pvpmacro.bow_boost": "Bow Boost",
+  "key.pvpmacro.auto_totem": "Toggle Auto Totem",
+  "key.pvpmacro.cancel": "Cancel Macro",
+  "key.pvpmacro.restock": "Toggle Restock",
+  "key.pvpmacro.open_menu": "Open Menu"
+}

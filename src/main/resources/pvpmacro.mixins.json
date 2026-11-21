@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "com.pvpmacro.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "server": [
+    "EntityTickListMixin",
+    "ProjectileMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

@@ -1,0 +1,9 @@
+Recovered from user-provided files:
+- pvpmacro-1.0.0-sources(2).jar
+- pvpmacro-1.0.0(2).jar
+
+The source archive provided Java source files, mixin configuration, Fabric metadata and language resources.
+The compiled archive provided the CC0 license and build metadata in META-INF/MANIFEST.MF.
+The original Gradle project and wrapper were not present.
+
+The compiled class files use Java class-file version 69 (Java 25).

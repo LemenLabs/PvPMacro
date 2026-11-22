@@ -67,6 +67,10 @@ final class BowBoost implements Step {
         snapOldPitch(mc, (float) Math.max(-90.0, Math.min(90.0, Config.get().bowBoostPitch)));
         Steps.useAndHold().run(mc);
         Steps.TRAIL.add("aim+draw");
+        if (ticks < Config.get().aimSyncTicks) {
+            ticks++;
+            return Step.REPEAT;
+        }
         state = S.DRAW; ticks = 0;
         return Step.REPEAT;
     }

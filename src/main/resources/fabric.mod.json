@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "pvpmacro",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "name": "PvP Macro",
-  "description": "Configurable keybind combos for PvP: swaps, stun slam, lunge, elytra mace, riptide mace, insta cart, expo, pearl catching.",
+  "description": "Configurable keybind combos for PvP (swaps, stun slam, lunge, elytra mace, insta cart, Xbow cart, pearl catching, bow boost), auto totem, restock and an in-game menu.",
   "environment": "*",
   "entrypoints": {
     "client": [

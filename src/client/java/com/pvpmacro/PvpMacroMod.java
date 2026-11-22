@@ -54,15 +54,16 @@ public class PvpMacroMod implements ClientModInitializer {
         autoTotemKey = KeyMappingHelper.registerKeyMapping(
             new KeyMapping("key.pvpmacro.auto_totem", GLFW.GLFW_KEY_UNKNOWN, category));
 
-        // Restock toggle: unbound by default (rebind it in Controls). The PvP Macro menu has the same switch.
+        // Restock toggle: unbound by default. Menu key: Right Shift.
         restockKey = KeyMappingHelper.registerKeyMapping(
             new KeyMapping("key.pvpmacro.restock", GLFW.GLFW_KEY_UNKNOWN, category));
 
-        // PvP Macro menu (settings screen). Default Right Shift; rebind in Controls.
-        menuKey = KeyMappingHelper.registerKeyMapping(
-            new KeyMapping("key.pvpmacro.menu", GLFW.GLFW_KEY_RIGHT_SHIFT, category));
+        // Inventory pull toggle: unbound by default. Menu key: Left Control.
+        inventoryPullKey = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping("key.pvpmacro.inventory_pull", GLFW.GLFW_KEY_UNKNOWN, category));
 
-        AutoTotem.enabled = Config.get().autoTotem;     // the switch is remembered between launches
+        menuKey = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping("key.pvpmacro.open_menu", GLFW.GLFW_KEY_RIGHT_SHIFT, category));
 
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
     }
@@ -71,11 +72,10 @@ public class PvpMacroMod implements ClientModInitializer {
         if (mc.player == null) { runner.reset(); glideTicks = 0; return; }   // left the world: drop any half-run macro
 
         if (cancelKey.consumeClick()) runner.cancel(mc);
-        if (menuKey.consumeClick() && mc.gui != null) mc.gui.setScreen(new PvpMacroScreen(null, 0));
         for (int i = 0; i < keys.size(); i++) {
             if (keys.get(i).consumeClick()) {
-                if (Config.get().macroEnabled(ids.get(i))) runner.press(mc, actions.get(i));
-                else PvpLog.info("macro '" + ids.get(i) + "' is switched off in the PvP Macro menu");
+                if (Config.get().isMacroEnabled(ids.get(i))) runner.press(mc, actions.get(i));
+                else Steps.msg(mc, "PvP Macro: " + ids.get(i) + " is switched off in the menu");
             }
         }
         Diagnostics.runOnce(mc);
@@ -84,6 +84,10 @@ public class PvpMacroMod implements ClientModInitializer {
         AutoTotem.tick(mc, runner.running());
         if (restockKey.consumeClick()) Restock.toggle(mc);
         Restock.tick(mc, runner.running());
+        if (inventoryPullKey.consumeClick()) InventoryPull.toggle(mc);
+        InventoryPull.tick(mc, runner.running());
+        if (menuKey.consumeClick() && !AutoTotem.screenOpen(mc)) mc.setScreen(new MenuScreen());
+        MenuScreen.tickFallback(mc);
 
         // Elytra guard: when low, swap back to the chestplate before the 1 second durability tick.
         Config cfg = Config.get();

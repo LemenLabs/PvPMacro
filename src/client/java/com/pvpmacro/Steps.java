@@ -17,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.phys.AABB;
@@ -734,6 +735,47 @@ public final class Steps {
             } catch (ReflectiveOperationException e) {
                 throw new IllegalStateException("cannot place the fire: " + e, e);
             }
+        };
+    }
+
+    // ---------- bow boost: pick the bow with the most Punch (1.1.0) ----------
+    /** Punch level of a bow (99 if the level cannot be read but Punch is there, 0 if none). Reflection: Enchantments.PUNCH / getLevel are unconfirmed for 26.2. */
+    private static int punchLevel(ItemStack s) {
+        try {
+            @SuppressWarnings("unchecked")
+            ResourceKey<Enchantment> punch = (ResourceKey<Enchantment>) Enchantments.class.getField("PUNCH").get(null);
+            var ench = s.getEnchantments();
+            for (Holder<Enchantment> h : ench.keySet()) {
+                if (h.is(punch)) {
+                    try { return ((Number) Reflect.invoke(ench, "getLevel", h)).intValue(); }
+                    catch (ReflectiveOperationException e) { return 99; }
+                }
+            }
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            PvpLog.info("Punch check failed: " + e);
+        }
+        return 0;
+    }
+
+    /**
+     * Select the hotbar bow with the highest Punch level (the self-hit knockback IS the boost; without Punch an arrow that lands on you
+     * barely moves you). Any bow is used if none has Punch. The bow you already hold wins ties.
+     */
+    public static Step bestBow() {
+        return mc -> {
+            int held = mc.player.getInventory().getSelectedSlot();
+            int best = -1, bestLevel = -1;
+            for (int i = 0; i < 9; i++) {
+                ItemStack s = mc.player.getInventory().getItem(i);
+                if (!s.is(Items.BOW)) continue;
+                int level = punchLevel(s);
+                if (level > bestLevel || (level == bestLevel && i == held)) { bestLevel = level; best = i; }
+            }
+            if (best < 0) { msg(mc, "PvP Macro: no bow in hotbar"); return Step.ABORT; }
+            PvpLog.info("bow boost: bow in slot " + best + " (Punch " + (bestLevel == 99 ? "?" : bestLevel) + ")");
+            if (bestLevel == 0) PvpLog.info("this bow has no Punch: an arrow that lands on you will barely move you");
+            if (best != held) SlotSync.select(mc, best);
+            return 0;
         };
     }
 }

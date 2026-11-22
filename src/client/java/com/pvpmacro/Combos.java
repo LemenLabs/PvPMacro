@@ -167,11 +167,11 @@ public final class Combos {
      */
     public static List<Step> bowBoost() {
         if (!"manual".equalsIgnoreCase(c().bowBoostMode)) {   // 1.0.8 default: fully automatic, see BowBoost.java
-            return List.of(slot("bow", item(Items.BOW)), label("bow boost", new BowBoost()));
+            return List.of(bestBow(), label("bow boost", new BowBoost()));
         }
         Steps.LookMemo look = new Steps.LookMemo();
         String noCamera = "PvP Macro: cannot turn the camera on this version (see the log)";
-        return List.of(label("bow", slot("bow", item(Items.BOW))),
+        return List.of(label("bow", bestBow()),
                        orAbort(rememberLook(look, () -> c().bowBoostRestoreLook), noCamera),
                        orAbort(label("look up", setPitch(() -> c().bowBoostPitch)), noCamera),
                        label("draw", useAndHold()), waitTicks(() -> c().bowBoostChargeTicks), label("shot", release()),

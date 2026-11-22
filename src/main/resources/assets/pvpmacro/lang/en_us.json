@@ -10,7 +10,7 @@
   "key.pvpmacro.pearl_catch": "Pearl Catch",
   "key.pvpmacro.bow_boost": "Bow Boost",
   "key.pvpmacro.auto_totem": "Toggle Auto Totem",
+  "key.pvpmacro.cancel": "Cancel Macro",
   "key.pvpmacro.restock": "Toggle Restock",
-  "key.pvpmacro.menu": "Open Menu",
-  "key.pvpmacro.cancel": "Cancel Macro"
+  "key.pvpmacro.open_menu": "Open Menu"
 }

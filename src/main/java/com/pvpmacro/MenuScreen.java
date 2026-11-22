@@ -43,35 +43,67 @@ public class MenuScreen extends Screen {
     }
 
     void build() {
+        // Prevent double-build or build before screen dimensions are ready
+        if (built && age < 3) return;
         built = true;
         try {
             Ui.clear(this);
-            int cx = this.width / 2;
-            int tw = 78, gap = 4, total = TABS.length * tw + (TABS.length - 1) * gap, tx = cx - total / 2;
+            // Use screen dimensions with safe defaults
+            int w = this.width > 0 ? this.width : 300;
+            int h = this.height > 0 ? this.height : 200;
+            int cx = w / 2;
+            int tw = 78, gap = 4, total = Math.min(TABS.length * tw + (TABS.length - 1) * gap, w - 20), tx = cx - total / 2;
             for (int i = 0; i < TABS.length; i++) {
                 final int idx = i;
-                Object b = Ui.button(this, TABS[i], tx + i * (tw + gap), 8, tw, 20, () -> { tab = idx; page = 0; build(); });
-                if (i == tab) Ui.setActive(b, false);
+                // Safe button creation with null check
+                try {
+                    Object b = Ui.button(this, TABS[i], tx + i * (tw + gap), 8, tw, 20, () -> { tab = idx; page = 0; build(); });
+                    if (i == tab) Ui.setActive(b, false);
+                } catch (Exception e) {
+                    PvpLog.info("menu tab button failed: " + e);
+                }
             }
             List<Row> rows = rowsFor(tab);
-            int perPage = Math.max(3, (this.height - 80) / 24);
+            // Safe page calculation with minimum height
+            int perPage = Math.max(3, (h > 80 ? h - 80 : 0) / 24);
             int pages = Math.max(1, (rows.size() + perPage - 1) / perPage);
-            page = Math.min(page, pages - 1);
+            page = Math.min(page, Math.max(0, pages - 1));
             int y = 40;
-            for (int i = page * perPage; i < Math.min(rows.size(), (page + 1) * perPage); i++) {
-                rows.get(i).add(this, cx - 100, y);
+            // Safe row rendering with bounds checking
+            for (int i = page * perPage; i < Math.min(rows.size(), Math.max(0, (page + 1) * perPage)); i++) {
+                try {
+                    rows.get(i).add(this, cx - 100, y);
+                } catch (Exception e) {
+                    PvpLog.info("menu row render failed: " + e);
+                }
                 y += 24;
             }
-            int fy = this.height - 26;
-            Ui.button(this, "Done", cx - 40, fy, 80, 20, () -> Ui.setScreen(Minecraft.getInstance(), null));
+            // Safe Done button with null-safe Minecraft instance
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc != null) {
+                    int fy = Math.max(26, h - 26);
+                    Ui.button(this, "Done", cx - 40, fy, 80, 20, () -> Ui.setScreen(mc, null));
+                }
+            } catch (Exception e) {
+                PvpLog.info("menu Done button failed: " + e);
+            }
+            // Safe navigation buttons
             if (pages > 1) {
-                Object prev = Ui.button(this, "< Prev", cx - 130, fy, 80, 20, () -> { page--; build(); });
-                Ui.setActive(prev, page > 0);
-                Object next = Ui.button(this, "Next >", cx + 50, fy, 80, 20, () -> { page++; build(); });
-                Ui.setActive(next, page < pages - 1);
+                try {
+                    Object prev = Ui.button(this, "< Prev", cx - 130, fy, 80, 20, () -> { page--; build(); });
+                    Ui.setActive(prev, page > 0);
+                    Object next = Ui.button(this, "> Next", cx + 50, fy, 80, 20, () -> { page++; build(); });
+                    Ui.setActive(next, page < pages - 1);
+                } catch (Exception e) {
+                    PvpLog.info("menu nav buttons failed: " + e);
+                }
             }
         } catch (RuntimeException e) {
             PvpLog.info("menu build failed: " + e);
+            // Reset build state so it can be retried
+            built = false;
+            age = 0;
         }
     }
 
